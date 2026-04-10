@@ -1,15 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
 
 :root {
-  --bg: #f8f6f1;
+  --bg: #faf9f6;
   --card: #ffffff;
-  --primary: #1b6b4a;
-  --primary-light: #e8f5ee;
-  --accent: #d4a24e;
-  --text: #2c2c2c;
-  --text-muted: #8a8a8a;
-  --border: #e8e4de;
-  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+  --primary: #1a7a52;
+  --primary-dark: #145e3f;
+  --primary-light: #e6f4ed;
+  --primary-glow: rgba(26, 122, 82, 0.12);
+  --accent: #c8913a;
+  --accent-light: #fef7ec;
+  --text: #1a1a2e;
+  --text-secondary: #5a5a72;
+  --text-muted: #9e9eb0;
+  --border: #eae8e3;
+  --border-light: #f2f0ec;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  --radius: 20px;
+  --radius-sm: 12px;
 }
 
 * {
@@ -19,8 +29,15 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: inherit;
 }
