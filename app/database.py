@@ -8,6 +8,10 @@ DATABASE_URL = os.getenv(
     "postgresql://deen:deen_secret_2024@localhost:5433/deen_tracker",
 )
 
+# Render uses postgres:// but SQLAlchemy needs postgresql://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 

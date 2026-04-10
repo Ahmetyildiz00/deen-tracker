@@ -42,14 +42,14 @@ function CheckIcon() {
 function App() {
   const [weekOffset, setWeekOffset] = useState(0)
   const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [fetching, setFetching] = useState(false)
 
   const fetchWeek = useCallback(async () => {
-    setLoading(true)
+    setFetching(true)
     const res = await fetch(`/api/week?week_offset=${weekOffset}`)
     const json = await res.json()
     setData(json)
-    setLoading(false)
+    setFetching(false)
   }, [weekOffset])
 
   useEffect(() => { fetchWeek() }, [fetchWeek])
@@ -73,7 +73,7 @@ function App() {
     })
   }
 
-  if (loading || !data) {
+  if (!data) {
     return (
       <div className="page">
         <div className="loader">
@@ -108,6 +108,7 @@ function App() {
       </nav>
 
       {/* Users */}
+      <div style={{ opacity: fetching ? 0.6 : 1, transition: 'opacity 0.2s ease' }}>
       {data.users.map(user => {
         const quranCount = data.days.filter(d => user.entries[d.date]?.quran).length
         const hadithCount = data.days.filter(d => user.entries[d.date]?.hadith).length
@@ -194,6 +195,7 @@ function App() {
           </section>
         )
       })}
+      </div>
     </div>
   )
 }
