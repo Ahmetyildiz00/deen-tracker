@@ -89,6 +89,7 @@ function App() {
       <header className="header">
         <div className="header-ornament" />
         <p className="bismillah">{BISMILLAH}</p>
+        <p className="bismillah-date">16.05.2026</p>
       </header>
 
       {/* Week Nav */}
