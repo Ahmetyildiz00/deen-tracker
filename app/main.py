@@ -1,3 +1,4 @@
+import calendar
 from contextlib import asynccontextmanager
 from datetime import date, timedelta
 from pathlib import Path
@@ -6,16 +7,37 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
-from sqlalchemy import and_
+from sqlalchemy import and_, inspect, text
 from sqlalchemy.orm import Session
 
 from app.database import Base, engine, get_db
 from app.models import DailyEntry, User
 
+# Tracked habits, in display order.
+FIELDS = ("quran", "hadith", "kusluk", "teheccud")
+
+
+def _ensure_columns():
+    """Add habit columns to an existing daily_entries table if missing."""
+    inspector = inspect(engine)
+    if "daily_entries" not in inspector.get_table_names():
+        return
+    existing = {col["name"] for col in inspector.get_columns("daily_entries")}
+    with engine.begin() as conn:
+        for field in FIELDS:
+            if field not in existing:
+                conn.execute(
+                    text(
+                        f"ALTER TABLE daily_entries "
+                        f"ADD COLUMN {field} BOOLEAN NOT NULL DEFAULT false"
+                    )
+                )
+
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     Base.metadata.create_all(bind=engine)
+    _ensure_columns()
     db = next(get_db())
     try:
         for name in ("Ahmet", "Müzeyyen"):
@@ -71,7 +93,9 @@ def get_week(week_offset: int = 0, db: Session = Depends(get_db)):
             )
             .all()
         )
-        entries = {r.date.isoformat(): {"quran": r.quran, "hadith": r.hadith} for r in rows}
+        entries = {
+            r.date.isoformat(): {f: getattr(r, f) for f in FIELDS} for r in rows
+        }
         users_data.append({
             "id": user.id,
             "name": user.name,
@@ -96,6 +120,58 @@ def get_week(week_offset: int = 0, db: Session = Depends(get_db)):
     }
 
 
+@app.get("/api/month")
+def get_month(month_offset: int = 0, db: Session = Depends(get_db)):
+    today = date.today()
+    year = today.year + (today.month - 1 + month_offset) // 12
+    month = (today.month - 1 + month_offset) % 12 + 1
+    days_in_month = calendar.monthrange(year, month)[1]
+    first = date(year, month, 1)
+    last = date(year, month, days_in_month)
+
+    users = db.query(User).order_by(User.id).all()
+
+    users_data = []
+    for user in users:
+        rows = (
+            db.query(DailyEntry)
+            .filter(
+                and_(
+                    DailyEntry.user_id == user.id,
+                    DailyEntry.date >= first,
+                    DailyEntry.date <= last,
+                )
+            )
+            .all()
+        )
+        entries = {
+            r.date.isoformat(): {f: getattr(r, f) for f in FIELDS} for r in rows
+        }
+        users_data.append({
+            "id": user.id,
+            "name": user.name,
+            "entries": entries,
+        })
+
+    days = [
+        {
+            "date": d.isoformat(),
+            "day_name": TURKISH_DAYS[d.weekday()],
+            "weekday": d.weekday(),
+            "day_num": d.day,
+            "is_today": d == today,
+        }
+        for d in (first + timedelta(days=i) for i in range(days_in_month))
+    ]
+
+    return {
+        "month_label": f"{TURKISH_MONTHS[month]} {year}",
+        "month_offset": month_offset,
+        "days": days,
+        "users": users_data,
+    }
+
+
 class ToggleRequest(BaseModel):
     user_id: int
     date: str
@@ -111,17 +187,15 @@ def toggle(body: ToggleRequest, db: Session = Depends(get_db)):
         .first()
     )
     if not entry:
-        entry = DailyEntry(user_id=body.user_id, date=d, quran=False, hadith=False)
+        entry = DailyEntry(user_id=body.user_id, date=d)
         db.add(entry)
         db.flush()
 
-    if body.field == "quran":
-        entry.quran = not entry.quran
-    elif body.field == "hadith":
-        entry.hadith = not entry.hadith
+    if body.field in FIELDS:
+        setattr(entry, body.field, not getattr(entry, body.field))
 
     db.commit()
-    return {"ok": True, "quran": entry.quran, "hadith": entry.hadith}
+    return {"ok": True, **{f: getattr(entry, f) for f in FIELDS}}
 
 
 # --- Serve React build ---

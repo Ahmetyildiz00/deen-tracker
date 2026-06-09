@@ -26,6 +26,8 @@ class DailyEntry(Base):
     date: Mapped[date] = mapped_column(Date, nullable=False)
     quran: Mapped[bool] = mapped_column(Boolean, default=False)
     hadith: Mapped[bool] = mapped_column(Boolean, default=False)
+    kusluk: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    teheccud: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now()
     )

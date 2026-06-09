@@ -75,6 +75,41 @@
   font-weight: 500;
 }
 
+/* ===== View Switcher ===== */
+.view-switcher {
+  display: flex;
+  gap: 4px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 4px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.view-tab {
+  flex: 1;
+  padding: 9px 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-tab:hover {
+  color: var(--primary);
+}
+
+.view-tab.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
 /* ===== Week Nav ===== */
 .week-nav {
   display: flex;
@@ -82,6 +117,10 @@
   justify-content: space-between;
   padding: 0 4px;
   margin-bottom: 20px;
+}
+
+.week-nav.centered {
+  justify-content: center;
 }
 
 .nav-btn {
@@ -216,63 +255,190 @@
   min-width: 0;
 }
 
-/* Days Header */
-.days-header {
+/* ===== Daily View (2x2 grid) ===== */
+.day-habits {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 8px;
-  padding: 0 2px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
-.day-col {
+.day-habit {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.day-label {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+.day-habit:active {
+  transform: scale(0.97);
 }
 
-.day-number {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  width: 26px;
-  height: 26px;
+.day-habit-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 800;
+  transition: all 0.2s;
 }
 
-.day-col.today .day-label {
+.day-habit-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Idle icon tints (match calendar legend / icons) */
+.day-habit.quran-icon .day-habit-icon { background: var(--primary-light); color: var(--primary); }
+.day-habit.hadith-icon .day-habit-icon { background: var(--accent-light); color: var(--accent); }
+.day-habit.kusluk-icon .day-habit-icon { background: var(--kusluk-light); color: var(--kusluk); }
+.day-habit.teheccud-icon .day-habit-icon { background: var(--teheccud-light); color: var(--teheccud); }
+
+/* Checked: whole card + icon take the habit colour */
+.day-habit.on .day-habit-icon { color: #fff; }
+
+.day-habit.quran-icon.on { border-color: var(--primary); background: var(--primary-light); }
+.day-habit.quran-icon.on .day-habit-icon { background: var(--primary); }
+.day-habit.hadith-icon.on { border-color: var(--accent); background: var(--accent-light); }
+.day-habit.hadith-icon.on .day-habit-icon { background: var(--accent); }
+.day-habit.kusluk-icon.on { border-color: var(--kusluk); background: var(--kusluk-light); }
+.day-habit.kusluk-icon.on .day-habit-icon { background: var(--kusluk); }
+.day-habit.teheccud-icon.on { border-color: var(--teheccud); background: var(--teheccud-light); }
+.day-habit.teheccud-icon.on .day-habit-icon { background: var(--teheccud); }
+
+.day-habit:hover { border-color: var(--text-muted); }
+.day-habit.quran-icon:hover { border-color: var(--primary); }
+.day-habit.hadith-icon:hover { border-color: var(--accent); }
+.day-habit.kusluk-icon:hover { border-color: var(--kusluk); }
+.day-habit.teheccud-icon:hover { border-color: var(--teheccud); }
+
+/* ===== Monthly Calendar View ===== */
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.legend-swatch.quran-icon { background: var(--primary); }
+.legend-swatch.hadith-icon { background: var(--accent); }
+.legend-swatch.kusluk-icon { background: var(--kusluk); }
+.legend-swatch.teheccud-icon { background: var(--teheccud); }
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  padding-bottom: 4px;
+}
+
+.calendar-blank {
+  /* empty leading cell */
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  padding: 4px 3px;
+}
+
+.calendar-day.today {
+  border-color: var(--primary);
+  border-style: dashed;
+}
+
+.calendar-day.complete {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.calendar-day-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.calendar-day.today .calendar-day-num {
   color: var(--primary);
 }
 
-.day-col.today .day-number {
-  background: var(--primary);
-  color: #fff;
+.calendar-cells {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3px;
+  width: 100%;
 }
 
-/* Tracker Row */
-.tracker-row {
-  padding: 10px 0;
-  border-top: 1px solid var(--border-light);
-}
-
-.tracker-label {
+.calendar-cell {
+  aspect-ratio: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  background: var(--card);
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: #fff;
+  padding: 0;
+  transition: all 0.15s;
 }
+
+.calendar-cell:active {
+  transform: scale(0.85);
+}
+
+.calendar-cell.quran-icon.on { background: var(--primary); border-color: var(--primary); }
+.calendar-cell.hadith-icon.on { background: var(--accent); border-color: var(--accent); }
+.calendar-cell.kusluk-icon.on { background: var(--kusluk); border-color: var(--kusluk); }
+.calendar-cell.teheccud-icon.on { background: var(--teheccud); border-color: var(--teheccud); }
+
+.calendar-cell.quran-icon:hover { border-color: var(--primary); }
+.calendar-cell.hadith-icon:hover { border-color: var(--accent); }
+.calendar-cell.kusluk-icon:hover { border-color: var(--kusluk); }
+.calendar-cell.teheccud-icon:hover { border-color: var(--teheccud); }
 
 .tracker-icon {
   width: 24px;
@@ -296,80 +462,14 @@
   color: var(--accent);
 }
 
-.tracker-text {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text);
+.kusluk-icon {
+  background: var(--kusluk-light);
+  color: var(--kusluk);
 }
 
-.tracker-count {
-  margin-left: auto;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-
-.tracker-cells {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  padding: 0 2px;
-}
-
-.tracker-cell {
-  display: flex;
-  justify-content: center;
-}
-
-/* Check Button */
-.check-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
-  border: 2px solid var(--border);
-  background: var(--bg);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  color: transparent;
-  position: relative;
-}
-
-.check-btn:hover {
-  border-color: var(--primary);
-  background: var(--primary-light);
-}
-
-.check-btn:active {
-  transform: scale(0.88);
-}
-
-.check-btn.today {
-  border-color: var(--primary);
-  border-style: dashed;
-}
-
-.check-btn.checked {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-  box-shadow: 0 2px 8px var(--primary-glow);
-}
-
-.check-btn.checked.today {
-  border-style: solid;
-}
-
-@keyframes pop {
-  0% { transform: scale(0.85); }
-  50% { transform: scale(1.15); }
-  100% { transform: scale(1); }
-}
-
-.check-btn.checked {
-  animation: pop 0.25s ease;
+.teheccud-icon {
+  background: var(--teheccud-light);
+  color: var(--teheccud);
 }
 
 /* ===== Footer ===== */
@@ -419,24 +519,17 @@
     transform: scale(0.85);
   }
 
-  .check-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
-  }
-
-  .day-number {
-    width: 22px;
-    height: 22px;
-    font-size: 0.72rem;
-  }
-
-  .day-label {
-    font-size: 0.58rem;
-  }
-
-  .tracker-cells {
+  .calendar {
     gap: 3px;
+  }
+
+  .calendar-day {
+    border-radius: 8px;
+  }
+
+  .calendar-dot {
+    width: 5px;
+    height: 5px;
   }
 
   .nav-btn {
@@ -446,24 +539,12 @@
 }
 
 @media (max-width: 360px) {
-  .check-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    border-width: 1.5px;
-  }
-
-  .check-btn svg {
-    width: 13px;
-    height: 13px;
-  }
-
   .user-card {
     padding: 14px 10px;
   }
 
-  .tracker-label {
-    gap: 6px;
+  .calendar-day-num {
+    font-size: 0.72rem;
   }
 
   .tracker-icon {
