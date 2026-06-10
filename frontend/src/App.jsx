@@ -3,12 +3,11 @@ import './App.css'
 
 const BISMILLAH = 'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ'
 
-// Tracked habits, in display order. Must stay in sync with backend FIELDS.
+// Tracked habits, in display order. Backend still stores kusluk/teheccud;
+// they're hidden from the UI for now — re-add the entries here to show them.
 const HABITS = [
   { key: 'quran', label: "Kur'an", short: 'Q', cls: 'quran-icon' },
   { key: 'hadith', label: 'Hadis', short: 'H', cls: 'hadith-icon' },
-  { key: 'kusluk', label: 'Kuşluk', short: 'K', cls: 'kusluk-icon' },
-  { key: 'teheccud', label: 'Teheccüd', short: 'T', cls: 'teheccud-icon' },
 ]
 
 const VIEWS = [
